@@ -1,12 +1,9 @@
 package auth.api.estudos.service;
 
 import auth.api.estudos.model.Autorizacao;
-import auth.api.estudos.model.Endereco;
 import auth.api.estudos.model.Usuario;
 import org.springframework.data.jpa.repository.Query;
 
-import java.util.Map;
-import java.util.Set;
 
 public interface UsuarioService {
     Usuario criandoUsuario (Usuario usuario);

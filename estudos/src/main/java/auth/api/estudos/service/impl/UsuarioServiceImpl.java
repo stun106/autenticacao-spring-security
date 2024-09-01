@@ -1,7 +1,6 @@
 package auth.api.estudos.service.impl;
 
 import auth.api.estudos.model.Autorizacao;
-import auth.api.estudos.model.Endereco;
 import auth.api.estudos.model.Usuario;
 import auth.api.estudos.repository.EnderecoRepository;
 import auth.api.estudos.repository.UsuarioReprository;
@@ -41,12 +40,13 @@ public class UsuarioServiceImpl implements UsuarioService {
         Usuario usuarioSalvo = usuarioReprository.save(usuario);
 
         if (usuario.getEndereco() != null && usuario.getEndereco().size() > 2) {
-           throw new RuntimeException("O usuario so pode cadastrar 2 endereços...");
+            throw new RuntimeException("O usuario so pode cadastrar 2 endereços...");
         }
-            for (Endereco endereco : usuarioSalvo.getEndereco()) {
-                endereco.setUsuario(usuario);
-                enderecoRepository.save(endereco);
-            }
+        //salva apenas endereços unicos
+        usuarioSalvo.getEndereco().forEach(endereco -> {
+            endereco.setUsuario(usuario);
+            enderecoRepository.save(endereco);
+        });
 
         return usuarioSalvo;
     }
