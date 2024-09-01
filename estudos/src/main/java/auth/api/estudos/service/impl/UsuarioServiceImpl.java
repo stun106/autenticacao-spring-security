@@ -1,60 +1,66 @@
 package auth.api.estudos.service.impl;
 
 import auth.api.estudos.model.Autorizacao;
-import auth.api.estudos.model.Credencial;
 import auth.api.estudos.model.Endereco;
 import auth.api.estudos.model.Usuario;
-import auth.api.estudos.repository.CredencialRepository;
 import auth.api.estudos.repository.EnderecoRepository;
 import auth.api.estudos.repository.UsuarioReprository;
-import auth.api.estudos.service.PasswordEncodeService;
 import auth.api.estudos.service.UsuarioService;
 import jakarta.persistence.EntityExistsException;
-import jakarta.transaction.Transactional;
+import jakarta.persistence.EntityNotFoundException;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.util.HashSet;
-import java.util.Set;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Log4j2
 public class UsuarioServiceImpl implements UsuarioService {
 
     @Autowired
     private UsuarioReprository usuarioReprository;
     @Autowired
     private EnderecoRepository enderecoRepository;
-    @Autowired
-    private PasswordEncodeService passwordEncodeService;
-    @Autowired
-    CredencialRepository credencialRepository;
+
+    private static String passwordEncode(String senha) {
+        return new BCryptPasswordEncoder().encode(senha);
+    }
 
     @Override
-    @Transactional
     public Usuario criandoUsuario(Usuario usuario) {
-        Usuario novoUsuario = usuarioReprository.findByNome(usuario.getNome());
-        if (novoUsuario != null) {
-            throw new EntityExistsException("Usuario já existe.");
+
+        Usuario usuarioExiste = usuarioReprository.findByNome(usuario.getNome());
+        if (usuarioExiste != null) {
+            throw new EntityExistsException("Usuario já Existe...");
         }
-            usuario.setRole(Autorizacao.USER);
-            Usuario esteUsuario = usuarioReprository.save(usuario);
 
-            Credencial credencialDoUsuario = credencialRepository.save(esteUsuario.getCredencial());
-            esteUsuario.getCredencial().setUsuario(esteUsuario);
-            esteUsuario.getCredencial().setSenha(passwordEncodeService.encodePassword(esteUsuario.getCredencial().getSenha()));
-            esteUsuario.setCredencial(credencialDoUsuario);
+        usuario.setSenha(passwordEncode(usuario.getSenha()));
+        usuario.setRole(Autorizacao.USER);
 
-            Set<Endereco> estesEnderecos = new HashSet<>();
-            if (esteUsuario.getEnderecos().size() <= 2) {
-                for (Endereco endereco : esteUsuario.getEnderecos()) {
-                    Endereco esteEndereco = enderecoRepository.save(endereco);
-                    estesEnderecos.add(esteEndereco);
-                }
-                esteUsuario.setEnderecos(estesEnderecos);
-                return esteUsuario;
-            } else {
-                throw new RuntimeException("No máximo dois endereços.");
+        Usuario usuarioSalvo = usuarioReprository.save(usuario);
+
+        if (usuario.getEndereco() != null && usuario.getEndereco().size() > 2) {
+           throw new RuntimeException("O usuario so pode cadastrar 2 endereços...");
+        }
+            for (Endereco endereco : usuarioSalvo.getEndereco()) {
+                endereco.setUsuario(usuario);
+                enderecoRepository.save(endereco);
             }
+
+        return usuarioSalvo;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Usuario buscarUsuarioPorEmail(String email) {
+        return usuarioReprository.findUsuarioByEmail(email)
+                .orElseThrow(() -> new EntityNotFoundException("Usuario não encontrado"));
+    }
+    @Override
+    @Transactional(readOnly = true)
+    public Autorizacao buscarRoleByEmail(String email) {
+        return usuarioReprository.buscarRolePorEmail(email);
     }
 }
 

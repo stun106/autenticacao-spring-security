@@ -1,12 +1,23 @@
 package auth.api.estudos.service;
 
+import auth.api.estudos.model.Autorizacao;
 import auth.api.estudos.model.Endereco;
 import auth.api.estudos.model.Usuario;
-import auth.api.estudos.web.dto.UsuarioLogadoTokenRecord;
-import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.data.jpa.repository.Query;
 
+import java.util.Map;
 import java.util.Set;
 
 public interface UsuarioService {
     Usuario criandoUsuario (Usuario usuario);
+
+    @Query(
+            value = """
+                    select u.id_usuario,c.id_credencial ,c.email ,c.senha , u."role" from usuario u
+                    join credencial c on u.id_usuario = c.id_usuario\s
+                    where c.email = :email;
+            """,nativeQuery = true)
+    Usuario buscarUsuarioPorEmail(String email);
+
+    Autorizacao buscarRoleByEmail(String email);
 }

@@ -1,10 +1,14 @@
 package auth.api.estudos.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -21,13 +25,12 @@ public class Usuario {
 
     private String nome;
     private String cpf;
-
-    @OneToOne(mappedBy = "usuario")
-    private Credencial credencial;
+    private String email;
+    private String senha;
 
     @Enumerated(value = EnumType.STRING)
     private Autorizacao role;
 
-    @OneToMany(mappedBy = "usuario")
-    private Set<Endereco> enderecos;
+    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL)
+    private List<Endereco> endereco;
 }

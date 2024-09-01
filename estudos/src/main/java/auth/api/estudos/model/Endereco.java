@@ -1,11 +1,14 @@
 package auth.api.estudos.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.Set;
 import java.util.UUID;
 
 @Data
@@ -25,7 +28,6 @@ public class Endereco {
     private String complemento;
 
     @ManyToOne
-    @JoinColumn(name = "id_usuario")
     @JsonIgnore
     private Usuario usuario;
 
