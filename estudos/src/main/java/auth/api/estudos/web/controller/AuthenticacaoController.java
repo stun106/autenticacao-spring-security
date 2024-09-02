@@ -2,6 +2,7 @@ package auth.api.estudos.web.controller;
 
 import auth.api.estudos.jwt.JwtToken;
 import auth.api.estudos.jwt.JwtUserDetailsService;
+import auth.api.estudos.service.exception.UnnauthorizedException;
 import auth.api.estudos.web.dto.AuthUsuarioRecord;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -38,7 +39,7 @@ public class AuthenticacaoController {
         } catch (AuthenticationException ex) {
             log.warn("Credencial invalida por email {}", authUsuarioRecord.email());
         }
-        System.out.println(authUsuarioRecord.senha());
-        return ResponseEntity.badRequest().body("Credenciais Invalidas");
+
+        throw new UnnauthorizedException("Credenciais invalidas...");
     }
 }
