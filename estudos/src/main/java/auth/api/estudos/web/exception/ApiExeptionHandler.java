@@ -43,6 +43,13 @@ public class ApiExeptionHandler {
                 .contentType(MediaType.APPLICATION_JSON)
                 .body(new ErrorMessage(request, HttpStatus.UNAUTHORIZED,ex.getMessage()));
     }
+    @ExceptionHandler(ForbiddenExeceptionHandle.class)
+    public ResponseEntity<ErrorMessage> forbiddenExeceptionHandle (RuntimeException ex, HttpServletRequest request) {
+        log.error( "api error", ex );
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(new ErrorMessage(request, HttpStatus.FORBIDDEN, ex.getMessage()));
+    }
     @ExceptionHandler(NullPointerAuthorizationException.class)
     public ResponseEntity<ErrorMessage> nullPointerAuthorizationException(NullPointerAuthorizationException ex, HttpServletRequest request){
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)

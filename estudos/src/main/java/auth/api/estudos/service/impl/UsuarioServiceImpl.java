@@ -1,25 +1,27 @@
 package auth.api.estudos.service.impl;
 
 import auth.api.estudos.model.Autorizacao;
-import auth.api.estudos.model.Endereco;
 import auth.api.estudos.model.Usuario;
 import auth.api.estudos.repository.EnderecoRepository;
 import auth.api.estudos.repository.UsuarioReprository;
 import auth.api.estudos.service.UsuarioService;
+import auth.api.estudos.service.exception.EntityNotfoundException;
 import auth.api.estudos.service.exception.NullPointerAuthorizationException;
+import auth.api.estudos.service.exception.PasswordInvalidException;
 import auth.api.estudos.service.exception.UniqueViolationExeception;
-import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
+import java.text.Format;
+import java.util.UUID;
 
 @Service
-@Log4j2
+@Slf4j
 public class UsuarioServiceImpl implements UsuarioService {
 
     @Autowired
@@ -29,6 +31,9 @@ public class UsuarioServiceImpl implements UsuarioService {
 
     private static String passwordEncode(String senha) {
         return new BCryptPasswordEncoder().encode(senha);
+    }
+    private static boolean passwordDecode(String senhaAtual, String senha) {
+        return new BCryptPasswordEncoder().matches(senhaAtual, senha);
     }
 
     @Override
@@ -65,6 +70,23 @@ public class UsuarioServiceImpl implements UsuarioService {
     @Transactional(readOnly = true)
     public Autorizacao buscarRoleByEmail(String email) {
         return usuarioReprository.buscarRolePorEmail(email);
+    }
+
+    @Override
+    public Usuario alterarSenha(UUID idUsuario, String senhaAtual, String novaSenha, String confirmaSenha) {
+        if (!novaSenha.equals(confirmaSenha)){
+            log.error( "Confirmação de senha invalida..." );
+            throw new PasswordInvalidException("Confirmação de senha Invalida...");
+        }
+
+        Usuario esteUsuario = usuarioReprository.findById(idUsuario)
+                .orElseThrow(() -> new EntityNotfoundException( "Usuario não encontrado..." ) );
+        if (!(passwordDecode( senhaAtual, esteUsuario.getSenha() ))) throw new PasswordInvalidException( "As credenciais não conferem, verifique seus dados..." );
+        System.out.println(esteUsuario.getNome());
+        esteUsuario.setSenha( passwordEncode( novaSenha ) );
+        usuarioReprository.save( esteUsuario );
+
+        return esteUsuario;
     }
 }
 

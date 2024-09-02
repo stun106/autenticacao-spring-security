@@ -2,6 +2,7 @@ package auth.api.estudos.web.controller;
 
 import auth.api.estudos.jwt.JwtToken;
 import auth.api.estudos.jwt.JwtUserDetailsService;
+import auth.api.estudos.service.exception.ForbiddenExeceptionHandle;
 import auth.api.estudos.service.exception.UnnauthorizedException;
 import auth.api.estudos.web.dto.AuthUsuarioRecord;
 import jakarta.servlet.http.HttpServletRequest;
@@ -11,7 +12,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -36,10 +36,9 @@ public class AuthenticacaoController {
 
             JwtToken token = jwtUserDetailsService.getTokenAuthenticated(authUsuarioRecord.email());
             return ResponseEntity.status(HttpStatus.OK).body(token);
-        } catch (AuthenticationException ex) {
+        } catch (UnnauthorizedException ex) {
             log.warn("Credencial invalida por email {}", authUsuarioRecord.email());
         }
-
-        throw new UnnauthorizedException("Credenciais invalidas...");
+            throw new ForbiddenExeceptionHandle("token inválido ou expirado...");
     }
 }

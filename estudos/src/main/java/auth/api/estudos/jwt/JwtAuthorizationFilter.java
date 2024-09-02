@@ -1,5 +1,7 @@
 package auth.api.estudos.jwt;
 
+import auth.api.estudos.service.exception.ForbiddenExeceptionHandle;
+import auth.api.estudos.service.exception.UnnauthorizedException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -28,13 +30,13 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     if (token == null || !token.startsWith(JwtUtils.JWT_BEARER)) {
         log.info("Jwt nulo, Vazio ou não iniciado como bearer...");
         filterChain.doFilter(request,response);
-        return;
+        throw new ForbiddenExeceptionHandle( "Jwt nulo, Vazio ou não iniciado como bearer..." );
     }
 
     if (!JwtUtils.isTokenValid(token)) {
         log.info("Token inválido ou expirado...");
         filterChain.doFilter(request,response);
-        return;
+        throw new ForbiddenExeceptionHandle( "token inválido ou expirado..." );
     }
 
     String userEmail = JwtUtils.getUserEmailFromToken(token);
