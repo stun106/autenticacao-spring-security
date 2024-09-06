@@ -1,12 +1,8 @@
 package auth.api.estudos.model;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonFormat;
-
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 
 import java.time.LocalDateTime;
@@ -17,31 +13,26 @@ import java.util.UUID;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "usuario")
-public class Usuario {
+public class Categoria {
     @Id
-    @Column(name = "id_usuario")
     @GeneratedValue(generator = "UUID")
-    private UUID idUsuario;
-
-    private String nome;
-    private String cpf;
-    private String email;
-    private String senha;
+    @Column(name = "id_categoria")
+    private UUID idCategoria;
 
     @CreatedDate
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     @Column(updatable = false)
     private LocalDateTime criadoEm;
 
-    @Enumerated(value = EnumType.STRING)
-    private Autorizacao role;
+    @Column(name = "nome_categoria",nullable = false)
+    private String nomeCategoria;
 
-    @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL)
-    private List<Endereco> endereco;
+    @OneToMany(mappedBy = "categoria", orphanRemoval = true)
+    private List<Produto> produtos;
 
     @PrePersist
     protected void aoCriar () {
         this.criadoEm = LocalDateTime.now();
     }
+
 }
