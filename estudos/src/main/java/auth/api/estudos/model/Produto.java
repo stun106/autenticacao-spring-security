@@ -1,6 +1,7 @@
 package auth.api.estudos.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -8,6 +9,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -33,6 +35,10 @@ public class Produto {
 
     @ManyToOne
     private Categoria categoria;
+
+    @ManyToOne
+    @JsonIgnore
+    private ListaProduto listaProduto;
 
     @PrePersist
     protected void aoCriar () {

@@ -1,6 +1,7 @@
 package auth.api.estudos.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -27,6 +28,7 @@ public class Categoria {
     @Column(name = "nome_categoria",nullable = false)
     private String nomeCategoria;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "categoria", orphanRemoval = true)
     private List<Produto> produtos;
 

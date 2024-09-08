@@ -10,14 +10,12 @@ import auth.api.estudos.service.exception.NullPointerAuthorizationException;
 import auth.api.estudos.service.exception.PasswordInvalidException;
 import auth.api.estudos.service.exception.UniqueViolationExeception;
 import jakarta.persistence.EntityNotFoundException;
-import lombok.extern.log4j.Log4j2;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.text.Format;
 import java.util.UUID;
 
 @Service
@@ -59,6 +57,12 @@ public class UsuarioServiceImpl implements UsuarioService {
 
         return usuarioSalvo;
     }
+
+    @Override
+    public Usuario buscarUsuarioPorNome(String nome) {
+        return usuarioReprository.findByNome( nome );
+    }
+
 
     @Override
     @Transactional(readOnly = true)

@@ -9,6 +9,8 @@ import java.util.UUID;
 public interface UsuarioService {
     Usuario criandoUsuario (Usuario usuario);
 
+    Usuario buscarUsuarioPorNome (String nome);
+
     Usuario buscarUsuarioPorEmail(String email);
 
     Autorizacao buscarRoleByEmail(String email);
